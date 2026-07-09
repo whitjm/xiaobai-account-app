@@ -1,0 +1,78 @@
+{
+  "name": "xiaobai-jizhang",
+  "version": "0.1.0",
+  "description": "小白记账 — 简单易用的桌面记账软件",
+  "author": "小白记账",
+  "license": "MIT",
+  "private": true,
+  "main": "electron/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev:vite": "vite",
+    "dev:electron": "wait-on tcp:5173 && node scripts/start-electron.js",
+    "dev": "concurrently -k \"npm:dev:vite\" \"npm:dev:electron\"",
+    "build": "vite build",
+    "dist": "vite build && electron-builder",
+    "dist:win": "vite build && electron-builder --win",
+    "dist:mac": "vite build && electron-builder --mac"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^33.3.1",
+    "electron-builder": "^25.1.8",
+    "vite": "^6.0.7",
+    "wait-on": "^8.0.1"
+  },
+  "dependencies": {
+    "date-fns": "^4.1.0",
+    "react": "^18.3.1",
+    "react-datepicker": "^7.5.0",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.15.0",
+    "sql.js": "^1.12.0",
+    "xlsx": "^0.18.5"
+  },
+  "build": {
+    "appId": "com.xiaobai.jizhang",
+    "productName": "小白记账",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "dist/**/*",
+      "node_modules/sql.js/dist/sql-wasm.wasm"
+    ],
+    "asarUnpack": [
+      "node_modules/sql.js/dist/sql-wasm.wasm"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "小白记账-安装程序-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "小白记账"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "category": "public.app-category.finance",
+      "artifactName": "小白记账-${version}-${arch}.${ext}"
+    }
+  }
+}

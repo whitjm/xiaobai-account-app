@@ -1,0 +1,738 @@
+/* ===== iOS 风格基础 ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* iOS 系统色 */
+  --ios-blue: #007aff;
+  --ios-green: #34c759;
+  --ios-red: #ff3b30;
+  --ios-indigo: #5856d6;
+  --ios-orange: #ff9500;
+
+  --primary: var(--ios-blue);
+  --expense: var(--ios-red);
+  --income: var(--ios-green);
+
+  /* iOS 分组背景 & 卡片(毛玻璃:半透明 + 背后渐变可透出) */
+  --bg: #f2f2f7;
+  --card: rgba(255, 255, 255, 0.45);
+  --card-solid: rgba(255, 255, 255, 0.72);
+  --card-2: rgba(120, 120, 128, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-blur: saturate(200%) blur(40px);
+
+  /* 文字 */
+  --text: #1c1c1e;
+  --text-2: #3c3c43;
+  --muted: #8e8e93;
+  --separator: rgba(60, 60, 67, 0.1);
+
+  --radius: 18px;
+  --radius-sm: 12px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 20px rgba(0, 0, 0, 0.04);
+
+  /* iOS 弹性过渡曲线 */
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: cubic-bezier(0.5, 1.4, 0.4, 1);
+}
+
+/* ===== 动画关键帧 ===== */
+@keyframes viewIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.995); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes itemIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes focusRing {
+  from { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.35); }
+  to { box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.18); }
+}
+
+/* 尊重系统「减少动态效果」设置 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+body {
+  font-family: -apple-system, "SF Pro Text", "SF Pro Display", "Segoe UI",
+    "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+  min-height: 100vh;
+  /* 柔和彩色渐变背景,给毛玻璃提供可透出、可模糊的底 */
+  background:
+    radial-gradient(1100px 560px at 6% 2%, rgba(90, 150, 255, 0.7), transparent 52%),
+    radial-gradient(1000px 620px at 98% 8%, rgba(190, 120, 255, 0.62), transparent 52%),
+    radial-gradient(1100px 700px at 42% 104%, rgba(70, 210, 190, 0.58), transparent 55%),
+    radial-gradient(700px 500px at 80% 70%, rgba(255, 170, 90, 0.4), transparent 55%),
+    linear-gradient(160deg, #e7ecfb 0%, #efeafb 50%, #e7f5f4 100%);
+  background-attachment: fixed;
+}
+
+.app {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 26px 44px;
+}
+
+.loading {
+  padding: 60px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* ===== 顶部 ===== */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.app-logo {
+  font-size: 28px;
+}
+
+.app-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+/* iOS 分段控件(记账/统计) */
+.app-tabs {
+  margin-left: 18px;
+  display: flex;
+  gap: 2px;
+  background: rgba(120, 120, 128, 0.12);
+  padding: 3px;
+  border-radius: 10px;
+}
+
+.app-tabs button {
+  padding: 6px 22px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  transition: color 0.25s var(--ease-ios), background 0.35s var(--ease-ios),
+    box-shadow 0.35s var(--ease-ios), transform 0.12s var(--ease-spring);
+}
+
+.app-tabs button:active {
+  transform: scale(0.94);
+}
+
+.app-tabs button.active {
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+/* ===== 数据管理工具条 ===== */
+.data-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.data-tools-title {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.data-tools button {
+  padding: 7px 15px;
+  border: none;
+  background: rgba(120, 120, 128, 0.1);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--primary);
+  transition: all 0.18s ease;
+}
+
+.data-tools button:hover:not(:disabled) {
+  background: rgba(0, 122, 255, 0.12);
+}
+
+.data-tools button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.data-tools button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.data-tools-msg {
+  font-size: 13px;
+  color: var(--income);
+  margin-left: 6px;
+  animation: fadein 0.25s;
+}
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== 时间筛选栏 ===== */
+.filter-bar {
+  background: var(--card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* iOS 分段控件风格的快捷范围 */
+.filter-modes {
+  display: flex;
+  gap: 2px;
+  background: rgba(120, 120, 128, 0.12);
+  padding: 3px;
+  border-radius: 10px;
+}
+
+.filter-modes button {
+  padding: 6px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  transition: color 0.25s var(--ease-ios), background 0.35s var(--ease-ios),
+    box-shadow 0.35s var(--ease-ios), transform 0.12s var(--ease-spring);
+}
+
+.filter-modes button:active {
+  transform: scale(0.94);
+}
+
+.filter-modes button.active {
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.filter-pager {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-pager button {
+  padding: 6px 14px;
+  border: none;
+  background: rgba(120, 120, 128, 0.1);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--primary);
+  transition: all 0.16s;
+}
+
+.filter-pager button:hover {
+  background: rgba(0, 122, 255, 0.12);
+}
+
+.filter-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 110px;
+  text-align: center;
+}
+
+.filter-custom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-custom .tilde {
+  color: var(--muted);
+}
+
+.date-input {
+  padding: 8px 13px;
+  border: none;
+  background: rgba(120, 120, 128, 0.1);
+  border-radius: 10px;
+  font-size: 14px;
+  width: 130px;
+  outline: none;
+  color: var(--text);
+}
+
+.date-input:focus {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+/* ===== 合计条 ===== */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.summary-item {
+  background: var(--card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.summary-icon {
+  font-size: 22px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.summary-item.income .summary-icon { background: rgba(52, 199, 89, 0.14); }
+.summary-item.expense .summary-icon { background: rgba(255, 59, 48, 0.13); }
+.summary-item.balance .summary-icon { background: rgba(0, 122, 255, 0.13); }
+
+.summary-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.summary-label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.summary-item.income .summary-value { color: var(--income); }
+.summary-item.expense .summary-value { color: var(--expense); }
+.summary-item.balance .summary-value { color: var(--primary); }
+
+/* ===== 主体两栏 ===== */
+.main-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 18px;
+  align-items: start;
+  animation: viewIn 0.4s var(--ease-ios);
+}
+
+.record-form,
+.record-list {
+  background: var(--card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow);
+}
+
+.record-form h2,
+.record-list h2 {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  letter-spacing: -0.02em;
+}
+/* ===== 记账表单 ===== */
+.type-toggle {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 20px;
+  background: rgba(120, 120, 128, 0.12);
+  padding: 3px;
+  border-radius: 11px;
+}
+
+.type-toggle button {
+  flex: 1;
+  padding: 9px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  transition: color 0.25s var(--ease-ios), background 0.35s var(--ease-ios),
+    box-shadow 0.35s var(--ease-ios), transform 0.12s var(--ease-spring);
+}
+
+.type-toggle button:active {
+  transform: scale(0.96);
+}
+
+.type-toggle button.active.expense {
+  background: var(--card);
+  color: var(--expense);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.type-toggle button.active.income {
+  background: var(--card);
+  color: var(--income);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.field span {
+  font-size: 13px;
+  color: var(--muted);
+  padding-left: 2px;
+}
+
+.field input,
+.field select {
+  padding: 11px 13px;
+  border: none;
+  background: var(--card-2);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  outline: none;
+  transition: box-shadow 0.25s var(--ease-ios), background 0.2s var(--ease-ios);
+  color: var(--text);
+}
+
+.field input:focus,
+.field select:focus {
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.35);
+}
+
+.field select:disabled {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.form-err {
+  color: var(--expense);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 13px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.18s var(--ease-ios), transform 0.16s var(--ease-spring),
+    box-shadow 0.2s var(--ease-ios);
+  box-shadow: 0 4px 14px rgba(0, 122, 255, 0.28);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 6px 18px rgba(0, 122, 255, 0.36);
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+}
+
+.btn-ghost {
+  padding: 13px 18px;
+  background: rgba(120, 120, 128, 0.12);
+  color: var(--primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  background: rgba(120, 120, 128, 0.18);
+}
+/* ===== 账目列表 ===== */
+.record-list ul {
+  list-style: none;
+  max-height: 560px;
+  overflow-y: auto;
+  margin: 0 -8px;
+  padding: 0 8px;
+}
+
+.record-list ul::-webkit-scrollbar {
+  width: 6px;
+}
+
+.record-list ul::-webkit-scrollbar-thumb {
+  background: rgba(120, 120, 128, 0.28);
+  border-radius: 3px;
+}
+
+.record-list.empty .empty-tip {
+  color: var(--muted);
+  padding: 50px 0;
+  text-align: center;
+}
+
+.record-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 10px;
+  border-radius: 12px;
+  transition: background 0.2s var(--ease-ios), transform 0.2s var(--ease-ios);
+  animation: itemIn 0.35s var(--ease-ios) both;
+}
+
+.record-item:hover {
+  background: var(--card-2);
+  transform: translateX(2px);
+}
+
+/* 列表项逐条错落淡入 */
+.record-item:nth-child(1) { animation-delay: 0.02s; }
+.record-item:nth-child(2) { animation-delay: 0.06s; }
+.record-item:nth-child(3) { animation-delay: 0.1s; }
+.record-item:nth-child(4) { animation-delay: 0.14s; }
+.record-item:nth-child(5) { animation-delay: 0.18s; }
+.record-item:nth-child(6) { animation-delay: 0.22s; }
+.record-item:nth-child(7) { animation-delay: 0.26s; }
+.record-item:nth-child(8) { animation-delay: 0.3s; }
+
+.record-item + .record-item {
+  border-top: 1px solid var(--separator);
+}
+
+.record-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.record-tag {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.record-tag.expense { background: var(--expense); }
+.record-tag.income { background: var(--income); }
+
+.record-cat {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.record-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.record-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.record-amount {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.record-amount.expense { color: var(--expense); }
+.record-amount.income { color: var(--income); }
+
+.record-ops,
+.confirm-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.confirm-box span {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.btn-ghost-sm,
+.btn-danger-sm {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.14s;
+}
+
+.btn-ghost-sm {
+  background: rgba(120, 120, 128, 0.12);
+  color: var(--primary);
+}
+
+.btn-ghost-sm:hover {
+  background: rgba(120, 120, 128, 0.2);
+}
+
+.btn-danger-sm {
+  background: var(--expense);
+  color: #fff;
+}
+
+.btn-danger-sm:active,
+.btn-ghost-sm:active {
+  transform: scale(0.95);
+}
+
+/* ===== 统计页 ===== */
+.stats {
+  animation: viewIn 0.4s var(--ease-ios);
+}
+
+.stats-toggle {
+  display: inline-flex;
+  gap: 2px;
+  margin-bottom: 18px;
+  background: rgba(120, 120, 128, 0.12);
+  padding: 3px;
+  border-radius: 11px;
+}
+
+.stats-toggle button {
+  padding: 8px 24px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  transition: color 0.25s var(--ease-ios), background 0.35s var(--ease-ios),
+    box-shadow 0.35s var(--ease-ios), transform 0.12s var(--ease-spring);
+}
+
+.stats-toggle button:active {
+  transform: scale(0.96);
+}
+
+.stats-toggle button.active.expense {
+  background: var(--card);
+  color: var(--expense);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.stats-toggle button.active.income {
+  background: var(--card);
+  color: var(--income);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.stats-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.chart-card {
+  background: var(--card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow);
+}
+
+.chart-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.stats .empty-tip {
+  color: var(--muted);
+  padding: 56px;
+  text-align: center;
+  background: var(--card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
