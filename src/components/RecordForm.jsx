@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { majorIcon } from '../utils/categoryIcons.js'
 
 // 今天的日期,格式 YYYY-MM-DD
 function today() {
@@ -104,7 +105,7 @@ export default function RecordForm({ categories, editing, onSave, onCancel }) {
           <option value="">请选择</option>
           {majorGroups.map((g) => (
             <option key={g.major} value={g.major}>
-              {g.major}
+              {majorIcon(g.major)} {g.major}
             </option>
           ))}
         </select>
@@ -120,8 +121,8 @@ export default function RecordForm({ categories, editing, onSave, onCancel }) {
         >
           <option value="">{form.major ? '请选择' : '请先选大类'}</option>
           {minors.map((m) => (
-            <option key={m} value={m}>
-              {m}
+            <option key={m.id} value={m.name}>
+              {m.name}
             </option>
           ))}
         </select>

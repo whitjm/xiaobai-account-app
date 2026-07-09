@@ -33,7 +33,7 @@ function seedDefaultCategories(db) {
     for (const group of DEFAULT_CATEGORIES[type]) {
       for (const minor of group.minors) {
         db.run(
-          'INSERT INTO categories (type, major, minor, sort) VALUES (?, ?, ?, ?)',
+          'INSERT INTO categories (type, major, minor, sort, is_preset) VALUES (?, ?, ?, ?, 1)',
           [type, group.major, minor, sort++]
         )
       }

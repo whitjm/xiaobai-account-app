@@ -1,21 +1,28 @@
 import { useState } from 'react'
 
 // 账目列表:按日期倒序展示每一笔,支持编辑和删除(删除有确认提示)。
-export default function RecordList({ records, onEdit, onDelete }) {
+// title/emptyTip 可自定义标题与空态文案,供记账页/编辑记录页复用。
+export default function RecordList({
+  records,
+  onEdit,
+  onDelete,
+  title = '账目明细',
+  emptyTip = '还没有记录,快去记第一笔吧 📝',
+}) {
   const [confirmId, setConfirmId] = useState(null) // 正在确认删除的记录 id
 
   if (records.length === 0) {
     return (
       <div className="record-list empty">
-        <h2>账目明细</h2>
-        <p className="empty-tip">还没有记录,快在左边记第一笔吧 📝</p>
+        <h2>{title}</h2>
+        <p className="empty-tip">{emptyTip}</p>
       </div>
     )
   }
 
   return (
     <div className="record-list">
-      <h2>账目明细</h2>
+      <h2>{title}</h2>
       <ul>
         {records.map((r) => (
           <li className="record-item" key={r.id}>

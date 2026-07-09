@@ -5,6 +5,9 @@ const path = require('path')
 const { initDb } = require('./db')
 const {
   getCategories,
+  addCategory,
+  updateCategory,
+  deleteCategory,
   addRecord,
   getRecords,
   updateRecord,
@@ -41,6 +44,9 @@ function createWindow() {
 // 注册界面可调用的后台接口(IPC):界面发请求 → 主进程查数据库 → 返回结果
 function registerIpcHandlers() {
   ipcMain.handle('categories:getAll', () => getCategories())
+  ipcMain.handle('categories:add', (_e, cat) => addCategory(cat))
+  ipcMain.handle('categories:update', (_e, cat) => updateCategory(cat))
+  ipcMain.handle('categories:delete', (_e, id) => deleteCategory(id))
   ipcMain.handle('records:getAll', () => getRecords())
   ipcMain.handle('records:add', (_e, record) => addRecord(record))
   ipcMain.handle('records:update', (_e, record) => updateRecord(record))

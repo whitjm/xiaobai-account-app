@@ -6,6 +6,9 @@ contextBridge.exposeInMainWorld('api', {
   ping: () => 'pong',
   // 分类
   getCategories: () => ipcRenderer.invoke('categories:getAll'),
+  addCategory: (cat) => ipcRenderer.invoke('categories:add', cat),
+  updateCategory: (cat) => ipcRenderer.invoke('categories:update', cat),
+  deleteCategory: (id) => ipcRenderer.invoke('categories:delete', id),
   // 账目增删改查
   getRecords: () => ipcRenderer.invoke('records:getAll'),
   addRecord: (record) => ipcRenderer.invoke('records:add', record),

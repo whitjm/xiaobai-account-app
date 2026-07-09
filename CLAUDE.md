@@ -155,6 +155,9 @@
 - 2026-07-08:实现统计图表(recharts)。新增「记账/统计」标签页;统计页含饼图(各分类占比)+ 折线图(金额按日期趋势),支持支出/收入切换,图表跟随时间筛选。用户验收通过。**阶段 4 完成。**
 - 2026-07-08:实现数据导入导出(xlsx + Electron 系统对话框)。electron/io.js 提供:导出 Excel(中文表头)、导入 Excel(追加、含校验跳过无效行)、备份数据(JSON,含 records+categories)、恢复数据(JSON,替换 records)。界面新增 DataTools 工具条,恢复前有覆盖确认。用户验收通过。**阶段 5 完成。**
 - 2026-07-08:界面美化。整体改为 iOS 风格(系统色 #007AFF/#34C759/#FF3B30、分段控件、大圆角、浅灰填充输入框);加彩色渐变背景 + 毛玻璃卡片(backdrop-filter,透明度 0.45 + blur 40px);加动效:分段控件弹性过渡、按钮点击缩放回弹、内容切换淡入(viewIn)、列表逐条错落淡入(itemIn)、输入框聚焦蓝色描边扩散;含 prefers-reduced-motion 无障碍处理。经多轮调整(加强磨砂/透明、补动画)用户验收通过。**阶段 6 完成。**
+- 2026-07-09:阶段 7 打包。修 db.js 让 sql.js 的 wasm 引擎以二进制方式读入(适配 asar 压缩包);package.json 增补 electron-builder 配置(NSIS 安装包、asarUnpack wasm)。遇 winCodeSign 解压失败(其含 macOS 符号链接需管理员权限),手动解压时排除 darwin 目录后成功。产出 release/小白记账-安装程序-0.1.0.exe。
+- 2026-07-09:接入 Git 版本管理(仅本地,未推送远程)。首个存档 e77e12b,含阶段 0-7。已向用户说明"推送到远程属对外发布、需单独同意"。
+- 2026-07-09:**新增功能——自定义分类 + 左侧菜单栏布局**。① 分类表加 is_preset 列区分预置/用户自建(含老库兼容:缺列则补列并把已有分类标为预置);② 后端 queries.js 增 addCategory/updateCategory/deleteCategory,预置分类拒绝改删;getCategories 返回结构改为小类带 {id,name,preset};③ 界面由顶部标签改为左侧菜单栏(Sidebar),分五页:首页(总览:本月结余大数字+支出饼图+最近账目)、记账(仅记新账)、统计、编辑记录(筛选+合计+数据管理+列表改删)、分类管理(增改删,预置只读带标记)。新增组件 Sidebar/Home/CategoryManager。此功能应用新协作规则:技术方案已列选项供用户选择。
 
 ### 开发环境备忘(技术备注)
 - 启动开发:`npm run dev`(同时起 Vite 和 Electron)。

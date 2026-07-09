@@ -51,9 +51,19 @@ function createTables() {
       type TEXT NOT NULL,              -- 'expense'(支出) 或 'income'(收入)
       major TEXT NOT NULL,             -- 一级大类名称
       minor TEXT NOT NULL,             -- 二级小类名称
-      sort INTEGER DEFAULT 0           -- 排序用
+      sort INTEGER DEFAULT 0,          -- 排序用
+      is_preset INTEGER DEFAULT 0      -- 1=软件预置(不可改删) 0=用户自建(可改删)
     );
   `)
+
+  // 兼容老数据库:早期版本的 categories 表没有 is_preset 列。
+  // 若缺列则补上,并把已有分类(都是预置的)统一标记为预置,避免被误当成用户分类。
+  const cols = db.exec("PRAGMA table_info(categories)")
+  const colNames = cols.length ? cols[0].values.map((r) => r[1]) : []
+  if (!colNames.includes('is_preset')) {
+    db.run('ALTER TABLE categories ADD COLUMN is_preset INTEGER DEFAULT 0')
+    db.run('UPDATE categories SET is_preset = 1')
+  }
 
   db.run(`
     CREATE TABLE IF NOT EXISTS records (
