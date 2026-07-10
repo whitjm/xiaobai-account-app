@@ -8,6 +8,7 @@ import FilterBar from './components/FilterBar.jsx'
 import Stats from './components/Stats.jsx'
 import DataTools from './components/DataTools.jsx'
 import CategoryManager from './components/CategoryManager.jsx'
+import SnakeGame from './components/SnakeGame.jsx'
 import { computeRange, shiftAnchor, inRange, fmt } from './utils/dateRange.js'
 
 // 左侧菜单栏布局:首页 / 记账 / 统计 / 编辑记录 / 分类管理。
@@ -183,6 +184,8 @@ export default function App() {
             <CategoryManager categories={categories} onChanged={refreshCategories} />
           </div>
         )}
+
+        {page === 'snake' && <SnakeGame />}
       </main>
     </div>
   )

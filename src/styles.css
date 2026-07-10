@@ -1181,3 +1181,138 @@ body {
   color: var(--muted);
   line-height: 1.6;
 }
+
+/* ===== 贪吃蛇小游戏 ===== */
+.snake-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 把整个游戏收进一张毛玻璃卡片,和主界面风格一致 */
+.snake-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  background: var(--card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  animation: viewIn 0.3s var(--ease-ios);
+}
+
+.snake-scoreboard {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.snake-score-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 110px;
+  padding: 10px 22px;
+  background: var(--card-2);
+  border-radius: var(--radius-sm);
+}
+
+.snake-score-best .snake-score-value {
+  color: var(--ios-orange);
+}
+
+.snake-score-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.snake-score-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.snake-stage {
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.08);
+  line-height: 0;
+}
+
+.snake-canvas {
+  display: block;
+}
+
+.snake-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: normal; /* 覆盖 .snake-stage 的 line-height:0,否则文字行高为0会重叠 */
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: viewIn 0.25s var(--ease-ios);
+}
+
+.snake-overlay-emoji {
+  font-size: 44px;
+  line-height: 1;
+  margin-bottom: 2px;
+  animation: toastPop 0.4s var(--ease-spring);
+}
+
+.snake-overlay-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.snake-overlay-tip {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.snake-btn {
+  flex: 0 0 auto; /* 覆盖全局 btn-primary 的 flex:1,否则会被拉成竖条 */
+  margin-top: 10px;
+  padding: 11px 32px;
+  font-size: 16px;
+}
+
+.snake-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  min-height: 40px;
+}
+
+.snake-ctrl-btn {
+  padding: 9px 20px;
+  font-size: 14px;
+}
+
+.snake-hint {
+  margin-top: 14px;
+  max-width: 420px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.snake-hint b {
+  color: var(--text-2);
+  font-weight: 600;
+}
