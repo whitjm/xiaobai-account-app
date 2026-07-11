@@ -14,7 +14,9 @@
     "build": "vite build",
     "dist": "vite build && electron-builder",
     "dist:win": "vite build && electron-builder --win",
-    "dist:mac": "vite build && electron-builder --mac"
+    "dist:mac": "vite build && electron-builder --mac",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
@@ -23,6 +25,7 @@
     "electron": "^33.3.1",
     "electron-builder": "^25.1.8",
     "vite": "^6.0.7",
+    "vitest": "^4.1.10",
     "wait-on": "^8.0.1"
   },
   "dependencies": {
@@ -52,7 +55,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "artifactName": "小白记账-安装程序-${version}.${ext}"
@@ -68,7 +73,10 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "category": "public.app-category.finance",

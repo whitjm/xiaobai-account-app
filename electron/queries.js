@@ -1,5 +1,5 @@
 // 数据查询模块:封装对数据库的读写操作,供主进程通过 IPC 调用。
-// 阶段 2 先实现分类的读取;阶段 3 会在这里补上账目的增删改查。
+// 包含两部分:分类的读取与增删改(上半部分)、账目的增删改查与合计(下半部分)。
 const { getDb } = require('./db')
 
 // 把 sql.js 的查询结果转成好用的对象数组
@@ -117,7 +117,6 @@ module.exports = {
   getRecords,
   updateRecord,
   deleteRecord,
-  getSummary,
 }
 
 // ============ 账目的增删改查 ============
@@ -182,20 +181,4 @@ function deleteRecord(id) {
   db.run('DELETE FROM records WHERE id=?', [id])
   save()
   return { ok: true }
-}
-
-// 合计:总支出、总收入、结余
-function getSummary() {
-  const db = getDb()
-  const result = db.exec(
-    `SELECT type, COALESCE(SUM(amount), 0) AS total FROM records GROUP BY type`
-  )
-  const rows = rowsToObjects(result)
-  let expense = 0
-  let income = 0
-  for (const row of rows) {
-    if (row.type === 'expense') expense = row.total
-    if (row.type === 'income') income = row.total
-  }
-  return { expense, income, balance: income - expense }
 }

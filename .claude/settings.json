@@ -27,5 +27,18 @@
     "additionalDirectories": [
       "C:\\Users\\WhiteJM\\AppData\\Local\\electron\\Cache"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/check-commit.js"
+          }
+        ]
+      }
+    ]
   }
 }

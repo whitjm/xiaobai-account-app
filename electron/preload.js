@@ -3,7 +3,6 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('api', {
-  ping: () => 'pong',
   // 分类
   getCategories: () => ipcRenderer.invoke('categories:getAll'),
   addCategory: (cat) => ipcRenderer.invoke('categories:add', cat),
@@ -14,7 +13,6 @@ contextBridge.exposeInMainWorld('api', {
   addRecord: (record) => ipcRenderer.invoke('records:add', record),
   updateRecord: (record) => ipcRenderer.invoke('records:update', record),
   deleteRecord: (id) => ipcRenderer.invoke('records:delete', id),
-  getSummary: () => ipcRenderer.invoke('records:summary'),
   // 数据导入导出
   exportExcel: () => ipcRenderer.invoke('io:exportExcel'),
   backupData: () => ipcRenderer.invoke('io:backup'),

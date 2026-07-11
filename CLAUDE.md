@@ -159,8 +159,11 @@
 - 2026-07-09:接入 Git 版本管理(仅本地,未推送远程)。首个存档 e77e12b,含阶段 0-7。已向用户说明"推送到远程属对外发布、需单独同意"。
 - 2026-07-09:**新增功能——自定义分类 + 左侧菜单栏布局**。① 分类表加 is_preset 列区分预置/用户自建(含老库兼容:缺列则补列并把已有分类标为预置);② 后端 queries.js 增 addCategory/updateCategory/deleteCategory,预置分类拒绝改删;getCategories 返回结构改为小类带 {id,name,preset};③ 界面由顶部标签改为左侧菜单栏(Sidebar),分五页:首页(总览:本月结余大数字+支出饼图+最近账目)、记账(仅记新账)、统计、编辑记录(筛选+合计+数据管理+列表改删)、分类管理(增改删,预置只读带标记)。新增组件 Sidebar/Home/CategoryManager。此功能应用新协作规则:技术方案已列选项供用户选择。
 
+- 2026-07-11:**新增——提交门禁机制(检查通过才能存档)**。① 门卫用 Claude Code 的 PreToolUse hook(配在 `.claude/settings.json`,盯 Bash 工具;脚本 `.claude/hooks/check-commit.js`):每当 Claude 要跑 `git commit`,查 `.claude/checks/` 下有没有两张通行证(`test.pass`+`quality.pass`),缺任一张就拦下(退出码 2)。脚本只拦"真执行 git commit"(命令开头或分隔符后),不误伤 echo 带字样。(曾先做过 git 原生 `.git/hooks/pre-commit`,后按用户要求删除,只留 settings.json 版。)② 改造 tester:测试全过写 `test.pass`,有失败删旧证。③ 改造 quality-engineer:定通过标准(只有高危安全问题——密钥泄露/SQL 注入等——才不通过,注释/命名/小 bug 只提醒不拦),无高危写 `quality.pass`,有高危删旧证。④ 新建 `/gitcommit` 技能(编排入口,必须是技能而非 agent,因 agent 不能再派 agent):清场→并行派 tester+quality-engineer→验两张通行证→调 `/git-save` 提交推送→push 成功后清理通行证(下次须重跑检查)。⑤ `/git-save` 保持独立不动。⑥ 通行证目录 `.claude/checks/` 已加进 .gitignore。门卫拦截/放行两方向均已试跑验证。
+
 ### 开发环境备忘(技术备注)
 - 启动开发:`npm run dev`(同时起 Vite 和 Electron)。
 - Electron 二进制若需重装,用国内镜像:`ELECTRON_MIRROR="https://npmmirror.com/mirrors/electron/"`。
 - 本机环境预设了 `ELECTRON_RUN_AS_NODE=1`,必须通过 scripts/start-electron.js 删除后再启动 Electron,否则崩溃。
+- **提交门禁**:正常存档走 `/gitcommit`(先检查后提交);它会自动生成/清理 `.claude/checks/` 下的通行证。直接手敲 `git commit` 会被 pre-commit hook 拦下,除非已有两张通行证。git hook 不随仓库同步,重新 clone 后需重新放置 `.git/hooks/pre-commit`。
 

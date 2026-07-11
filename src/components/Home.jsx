@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { computeRange, inRange } from '../utils/dateRange.js'
+import { computeSummary } from '../utils/summary.js'
 
 const COLORS = [
   '#007aff', '#ff3b30', '#34c759', '#ff9500', '#5856d6',
@@ -18,15 +19,7 @@ export default function Home({ records, onNavigate }) {
   )
 
   // 本月合计
-  const summary = useMemo(() => {
-    let expense = 0
-    let income = 0
-    for (const r of monthRecs) {
-      if (r.type === 'expense') expense += r.amount
-      else if (r.type === 'income') income += r.amount
-    }
-    return { expense, income, balance: income - expense }
-  }, [monthRecs])
+  const summary = useMemo(() => computeSummary(monthRecs), [monthRecs])
 
   // 本月支出按大类占比(小饼图)
   const pieData = useMemo(() => {

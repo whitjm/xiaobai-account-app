@@ -85,23 +85,41 @@ async function restoreData() {
 
   const db = getDb()
   db.run('DELETE FROM records')
+  let restored = 0
+  let skipped = 0
   for (const r of data.records) {
+    // 备份文件可能被手改坏,和导入 Excel 一样逐行校验,不合格的跳过,避免脏数据进账本
+    const amt = parseFloat(r.amount)
+    if (!isValidRecord(r.type, amt, r.major, r.minor, r.date)) {
+      skipped++
+      continue
+    }
     db.run(
       `INSERT INTO records (type, amount, major, minor, date, note, created_at)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         r.type,
-        r.amount,
-        r.major,
-        r.minor,
-        r.date,
-        r.note || '',
+        amt,
+        String(r.major),
+        String(r.minor),
+        String(r.date),
+        r.note ? String(r.note) : '',
         r.created_at || new Date().toISOString(),
       ]
     )
+    restored++
   }
   save()
-  return { ok: true, count: data.records.length }
+  return { ok: true, count: restored, skipped }
+}
+
+// 一笔账目是否有效:类型合法、金额为正数、分类和日期都得有。
+// 恢复备份和导入 Excel 共用这套校验,防止坏数据进账本。
+function isValidRecord(type, amount, major, minor, date) {
+  if (type !== 'expense' && type !== 'income') return false
+  if (isNaN(amount) || amount <= 0) return false
+  if (!major || !minor || !date) return false
+  return true
 }
 
 // —— 导入 Excel ——
@@ -131,8 +149,8 @@ async function importExcel() {
     const [typeCn, amount, major, minor, date, note] = rows[i]
     const type = CN_TYPE[String(typeCn).trim()] || null
     const amt = parseFloat(amount)
-    // 基本校验:类型、金额、分类、日期都得有效,否则跳过这一行
-    if (!type || isNaN(amt) || amt <= 0 || !major || !minor || !date) {
+    // 基本校验:类型、金额、分类、日期都得有效,否则跳过这一行(与恢复备份共用)
+    if (!isValidRecord(type, amt, major, minor, date)) {
       skipped++
       continue
     }
