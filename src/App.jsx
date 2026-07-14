@@ -8,9 +8,7 @@ import FilterBar from './components/FilterBar.jsx'
 import Stats from './components/Stats.jsx'
 import DataTools from './components/DataTools.jsx'
 import CategoryManager from './components/CategoryManager.jsx'
-import SnakeGame from './components/SnakeGame.jsx'
 import { computeRange, shiftAnchor, inRange, fmt } from './utils/dateRange.js'
-import { computeSummary } from './utils/summary.js'
 
 // 左侧菜单栏布局:首页 / 记账 / 统计 / 编辑记录 / 分类管理。
 export default function App() {
@@ -53,7 +51,15 @@ export default function App() {
     [records, range]
   )
 
-  const summary = useMemo(() => computeSummary(filtered), [filtered])
+  const summary = useMemo(() => {
+    let expense = 0
+    let income = 0
+    for (const r of filtered) {
+      if (r.type === 'expense') expense += r.amount
+      else if (r.type === 'income') income += r.amount
+    }
+    return { expense, income, balance: income - expense }
+  }, [filtered])
 
   async function handleSave(record) {
     if (record.id) await window.api.updateRecord(record)
@@ -100,15 +106,8 @@ export default function App() {
       }}
       onShift={(step) => setAnchor((a) => shiftAnchor(mode, a, step))}
       onCustomChange={(s, e) => {
-        // 防止用户把开始日期选得比结束日期还晚(那样列表会一条都不显示):
-        // 若选反了就自动对调,保证 start <= end。
-        let start = s || customStart
-        let end = e || customEnd
-        if (start && end && start > end) {
-          ;[start, end] = [end, start]
-        }
-        setCustomStart(start)
-        setCustomEnd(end)
+        if (s) setCustomStart(s)
+        if (e) setCustomEnd(e)
       }}
     />
   )
@@ -184,8 +183,6 @@ export default function App() {
             <CategoryManager categories={categories} onChanged={refreshCategories} />
           </div>
         )}
-
-        {page === 'snake' && <SnakeGame />}
       </main>
     </div>
   )

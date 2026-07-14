@@ -5,7 +5,6 @@ const MENU = [
   { key: 'stats', label: '统计', icon: '📊' },
   { key: 'edit', label: '编辑记录', icon: '📋' },
   { key: 'category', label: '分类管理', icon: '🏷️' },
-  { key: 'snake', label: '小游戏', icon: '🐍' },
 ]
 
 export default function Sidebar({ page, onChange }) {

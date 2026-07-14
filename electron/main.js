@@ -12,10 +12,11 @@ const {
   getRecords,
   updateRecord,
   deleteRecord,
+  getSummary,
 } = require('./queries')
 const { exportExcel, backupData, restoreData, importExcel } = require('./io')
 
-// 是否处于开发模式:靠 Electron 的"是否已打包"来判断——没打包(直接跑源码)就是开发中
+// 是否处于开发模式:开发时通过环境变量 VITE_DEV 判断
 const isDev = !app.isPackaged
 
 function createWindow() {
@@ -50,6 +51,7 @@ function registerIpcHandlers() {
   ipcMain.handle('records:add', (_e, record) => addRecord(record))
   ipcMain.handle('records:update', (_e, record) => updateRecord(record))
   ipcMain.handle('records:delete', (_e, id) => deleteRecord(id))
+  ipcMain.handle('records:summary', () => getSummary())
   ipcMain.handle('io:exportExcel', () => exportExcel())
   ipcMain.handle('io:backup', () => backupData())
   ipcMain.handle('io:restore', () => restoreData())
