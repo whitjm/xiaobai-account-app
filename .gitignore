@@ -4,3 +4,7 @@ dist-electron/
 release/
 *.log
 .DS_Store
+.agents/
+.claude/checks/
+.codex/
+coverage/
