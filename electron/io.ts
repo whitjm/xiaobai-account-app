@@ -3,20 +3,20 @@
 //  2) 备份数据(.json):完整备份,用于换电脑/重装后恢复。
 //  3) 恢复数据(.json):从备份文件读回账目。
 //  4) 导入 Excel(.xlsx):把 Excel 里的账目加进来。
-const { dialog } = require('electron')
-const fs = require('fs')
-const XLSX = require('xlsx')
-const { getDb, save } = require('./db')
-const { getRecords, rowsToObjects } = require('./queries')
+import { dialog } from 'electron'
+import fs from 'fs'
+import XLSX from 'xlsx'
+import { getDb, save } from './db'
+import { getRecords, rowsToObjects } from './queries'
 
-const TYPE_CN = { expense: '支出', income: '收入' }
-const CN_TYPE = { 支出: 'expense', 收入: 'income' }
+const TYPE_CN: Record<string, string> = { expense: '支出', income: '收入' }
+const CN_TYPE: Record<string, string> = { 支出: 'expense', 收入: 'income' }
 
 // 中文表头,方便用户在 Excel 里看懂
 const HEADERS = ['类型', '金额', '大类', '小类', '日期', '备注']
 
 // —— 导出 Excel ——
-async function exportExcel() {
+export async function exportExcel(): Promise<{ ok: boolean; canceled?: boolean; count?: number; filePath?: string; error?: string }> {
   const { canceled, filePath } = await dialog.showSaveDialog({
     title: '导出为 Excel',
     defaultPath: `小白记账_${today()}.xlsx`,
@@ -26,7 +26,7 @@ async function exportExcel() {
 
   const records = getRecords()
   const rows = records.map((r) => [
-    TYPE_CN[r.type] || r.type,
+    TYPE_CN[r.type as string] || r.type,
     r.amount,
     r.major,
     r.minor,
@@ -41,7 +41,7 @@ async function exportExcel() {
 }
 
 // —— 备份数据(JSON)——
-async function backupData() {
+export async function backupData(): Promise<{ ok: boolean; canceled?: boolean; count?: number; filePath?: string; error?: string }> {
   const { canceled, filePath } = await dialog.showSaveDialog({
     title: '备份数据',
     defaultPath: `小白记账_备份_${today()}.json`,
@@ -50,8 +50,8 @@ async function backupData() {
   if (canceled || !filePath) return { ok: false, canceled: true }
 
   const db = getDb()
-  const records = rowsToObjects(db.exec('SELECT * FROM records'))
-  const categories = rowsToObjects(db.exec('SELECT * FROM categories'))
+  const records = rowsToObjects(db!.exec('SELECT * FROM records'))
+  const categories = rowsToObjects(db!.exec('SELECT * FROM categories'))
   const payload = {
     app: '小白记账',
     version: 1,
@@ -65,7 +65,7 @@ async function backupData() {
 
 // —— 恢复数据(JSON)——
 // 用备份文件里的账目替换当前账目(会先确认)。分类保持不变。
-async function restoreData() {
+export async function restoreData(): Promise<{ ok: boolean; canceled?: boolean; count?: number; error?: string }> {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     title: '选择备份文件',
     properties: ['openFile'],
@@ -73,7 +73,7 @@ async function restoreData() {
   })
   if (canceled || !filePaths.length) return { ok: false, canceled: true }
 
-  let data
+  let data: { records?: unknown[] }
   try {
     data = JSON.parse(fs.readFileSync(filePaths[0], 'utf-8'))
   } catch {
@@ -84,9 +84,9 @@ async function restoreData() {
   }
 
   const db = getDb()
-  db.run('DELETE FROM records')
-  for (const r of data.records) {
-    db.run(
+  db!.run('DELETE FROM records')
+  for (const r of data.records as { type: string; amount: number; major: string; minor: string; date: string; note?: string; created_at?: string }[]) {
+    db!.run(
       `INSERT INTO records (type, amount, major, minor, date, note, created_at)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
@@ -106,7 +106,7 @@ async function restoreData() {
 
 // —— 导入 Excel ——
 // 读取 Excel 里的账目,追加到当前账目中(不删除已有数据)。
-async function importExcel() {
+export async function importExcel(): Promise<{ ok: boolean; canceled?: boolean; imported?: number; skipped?: number; error?: string }> {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     title: '选择要导入的 Excel',
     properties: ['openFile'],
@@ -114,7 +114,7 @@ async function importExcel() {
   })
   if (canceled || !filePaths.length) return { ok: false, canceled: true }
 
-  let rows
+  let rows: unknown[][]
   try {
     const book = XLSX.readFile(filePaths[0])
     const sheet = book.Sheets[book.SheetNames[0]]
@@ -128,18 +128,27 @@ async function importExcel() {
   let skipped = 0
   // 跳过表头行(第一行),从第二行开始
   for (let i = 1; i < rows.length; i++) {
-    const [typeCn, amount, major, minor, date, note] = rows[i]
+    const row = rows[i]
+    const [typeCn, amount, major, minor, date, note] = row as [string, number, string, string, string, string]
     const type = CN_TYPE[String(typeCn).trim()] || null
-    const amt = parseFloat(amount)
+    const amt = parseFloat(String(amount))
     // 基本校验:类型、金额、分类、日期都得有效,否则跳过这一行
     if (!type || isNaN(amt) || amt <= 0 || !major || !minor || !date) {
       skipped++
       continue
     }
-    db.run(
+    db!.run(
       `INSERT INTO records (type, amount, major, minor, date, note, created_at)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [type, amt, String(major), String(minor), normalizeDate(date), note ? String(note) : '', new Date().toISOString()]
+      [
+        type,
+        amt,
+        String(major),
+        String(minor),
+        normalizeDate(date),
+        note ? String(note) : '',
+        new Date().toISOString(),
+      ]
     )
     imported++
   }
@@ -148,7 +157,7 @@ async function importExcel() {
 }
 
 // 把 Excel 里可能是日期对象或各种写法的日期,规整成 YYYY-MM-DD
-function normalizeDate(v) {
+function normalizeDate(v: string | Date): string {
   if (v instanceof Date) return fmtDate(v)
   const s = String(v).trim()
   // already YYYY-MM-DD
@@ -158,13 +167,11 @@ function normalizeDate(v) {
   return s
 }
 
-function fmtDate(d) {
-  const p = (n) => String(n).padStart(2, '0')
+function fmtDate(d: Date): string {
+  const p = (n: number) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
 
-function today() {
+function today(): string {
   return fmtDate(new Date())
 }
-
-module.exports = { exportExcel, backupData, restoreData, importExcel }

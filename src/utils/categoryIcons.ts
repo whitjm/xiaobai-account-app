@@ -1,5 +1,5 @@
 // 按大类名称给一个 emoji 图标。找不到就用默认图标(多为用户自建的新大类)。
-const ICONS = {
+const ICONS: Record<string, string> = {
   // 支出
   餐饮: '🍚',
   交通: '🚗',
@@ -18,6 +18,6 @@ const ICONS = {
 
 const DEFAULT_ICON = '🏷️'
 
-export function majorIcon(major) {
+export function majorIcon(major: string): string {
   return ICONS[major] || DEFAULT_ICON
 }

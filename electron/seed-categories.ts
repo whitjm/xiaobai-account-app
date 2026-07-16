@@ -1,6 +1,13 @@
 // 默认分类数据:软件首次运行时灌入,开箱即用。
 // 已由用户确认(2026-07-08)。结构:type(支出/收入)→ major(大类)→ minor 列表(小类)。
 
+interface SqlJs {
+  Database: new (data?: ArrayLike<number>) => {
+    exec: (sql: string, params?: unknown[]) => { columns: string[]; values: unknown[][] }[]
+    run: (sql: string, params?: unknown[]) => void
+  }
+}
+
 const DEFAULT_CATEGORIES = {
   expense: [
     { major: '餐饮', minors: ['早餐', '午餐', '晚餐', '饮料零食', '下馆子'] },
@@ -23,13 +30,13 @@ const DEFAULT_CATEGORIES = {
 }
 
 // 只在分类表为空时灌入,避免用户后续自定义的分类被覆盖
-function seedDefaultCategories(db) {
+export function seedDefaultCategories(db: { exec: (sql: string) => { columns: string[]; values: unknown[][] }[]; run: (sql: string, params?: unknown[]) => void }): void {
   const result = db.exec('SELECT COUNT(*) AS n FROM categories')
-  const count = result.length ? result[0].values[0][0] : 0
+  const count = result.length ? (result[0].values[0][0] as number) : 0
   if (count > 0) return
 
   let sort = 0
-  for (const type of ['expense', 'income']) {
+  for (const type of ['expense', 'income'] as const) {
     for (const group of DEFAULT_CATEGORIES[type]) {
       for (const minor of group.minors) {
         db.run(
@@ -41,4 +48,4 @@ function seedDefaultCategories(db) {
   }
 }
 
-module.exports = { seedDefaultCategories, DEFAULT_CATEGORIES }
+export { DEFAULT_CATEGORIES }

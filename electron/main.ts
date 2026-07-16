@@ -1,9 +1,9 @@
 // Electron 主进程:负责创建应用窗口。
 // 开发时加载 Vite 本地服务器(热更新),打包后加载构建好的静态文件。
-const { app, BrowserWindow, ipcMain } = require('electron')
-const path = require('path')
-const { initDb } = require('./db')
-const {
+import { app, BrowserWindow, ipcMain } from 'electron'
+import path from 'path'
+import { initDb } from './db'
+import {
   getCategories,
   addCategory,
   updateCategory,
@@ -13,8 +13,8 @@ const {
   updateRecord,
   deleteRecord,
   getSummary,
-} = require('./queries')
-const { exportExcel, backupData, restoreData, importExcel } = require('./io')
+} from './queries'
+import { exportExcel, backupData, restoreData, importExcel } from './io'
 
 // 是否处于开发模式:开发时通过环境变量 VITE_DEV 判断
 const isDev = !app.isPackaged
