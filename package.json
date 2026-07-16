@@ -108,7 +108,9 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "小白记账"
+      "shortcutName": "小白记账",
+      "installerLanguages": ["zh_CN", "en"],
+      "language": "2052"
     },
     "mac": {
       "target": [
