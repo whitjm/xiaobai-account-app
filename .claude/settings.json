@@ -1,31 +1,43 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run *)",
-      "Bash(ELECTRON_MIRROR=\"https://npmmirror.com/mirrors/electron/\" node node_modules/electron/install.js)",
-      "Bash(rm -rf node_modules/electron)",
-      "Read(//c/Users/WhiteJM/AppData/Local/electron/Cache/**)",
-      "Read(//c/Users/WhiteJM/AppData/Roaming/npm-cache/**)",
-      "Bash(rm -rf \"$HOME/AppData/Local/electron/Cache\" && echo \"cache cleared\")",
-      "Bash(ELECTRON_MIRROR=\"https://npmmirror.com/mirrors/electron/\" npm install electron@33.3.1 --save-dev)",
-      "Bash(npm config *)",
-      "Read(//c/Users/WhiteJM/AppData/Local/**)",
-      "Read(//c/Users/WhiteJM/AppData/Local/electron/**)",
-      "Bash(ls -la \"/c/Users/WhiteJM/AppData/Local/electron/Cache/b2fe3d96265abfa5e1554d71191fc0179114ca5ccac7369f2e9d49b1122b97f2/electron-v33.3.1-win32-x64.zip\")",
-      "Read(//c/Users/WhiteJM/AppData/Local/electron/Cache/b2fe3d96265abfa5e1554d71191fc0179114ca5ccac7369f2e9d49b1122b97f2/**)",
-      "Bash(netstat -ano)",
-      "Bash(taskkill //F //PID 37332)",
-      "Bash(taskkill //F //IM electron.exe)",
-      "Bash(node -e ' *)",
-      "Bash(rm -rf tmp-test)",
-      "Bash(rm -f tmp-test.xlsx)",
-      "Bash(ELECTRON_MIRROR=\"https://npmmirror.com/mirrors/electron/\" ELECTRON_BUILDER_BINARIES_MIRROR=\"https://npmmirror.com/mirrors/electron-builder-binaries/\" npm run dist:win)",
-      "Bash(ls -la \"$HOME/AppData/Local/electron-builder/Cache/winCodeSign/\" 2>&1)",
-      "Read(//c/Users/WhiteJM/AppData/Local/electron-builder/Cache/winCodeSign/**)",
-      "Read(//c/Users/WhiteJM/AppData/Local/electron-builder/Cache/winCodeSign/winCodeSign-2.6.0/**)"
-    ],
-    "additionalDirectories": [
-      "C:\\Users\\WhiteJM\\AppData\\Local\\electron\\Cache"
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(git *)",
+      "Bash(rm *)",
+      "Bash(mkdir *)",
+      "Bash(ls *)",
+      "Bash(echo *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(sleep *)",
+      "Bash(curl *)",
+      "Bash(taskkill *)",
+      "Bash(tasklist *)",
+      "Bash(netstat *)",
+      "Bash(cmd //c *)",
+      "Bash(pip *)",
+      "Bash(python *)",
+      "Bash(PYTHONIOENCODING=utf-8 python *)",
+      "Bash(PYTHONUTF8=1 python *)",
+      "Bash(node .claude/hooks/check-commit.js)",
+      "Read(C:\Users\WhiteJM\.claude\projects\e--ItHeima---APP\**)",
+      "Read(C:\Users\WhiteJM\.ssh\**)",
+      "WebFetch(domain:docs.claude.com)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/check-commit.js"
+          }
+        ]
+      }
     ]
   }
 }
