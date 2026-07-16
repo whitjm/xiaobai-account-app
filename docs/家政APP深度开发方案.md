@@ -1009,17 +1009,19 @@ function log(level, message, data = {}) {
 ---
 
 #### 步骤 6.2：Release 自动化
-**文件:** `.github/workflows/release.yml`
+**文件:** `.github/workflows/build.yml`（release job，已集成在构建流程中）
 
 **内容:**
-- 配置 Tag 触发 Release
-- 自动生成 Release Notes
-- 上传安装包到 GitHub Release
+- 配置 Tag 触发 Release（`if: startsWith(github.ref, 'refs/tags/v')`）
+- 自动生成 Release Notes（`generate_release_notes: true`）
+- 上传安装包到 GitHub Release（`softprops/action-gh-release`）
 
 **验收标准:**
-- [ ] 打 Tag 后自动创建 Release
-- [ ] Release 包含安装包
-- [ ] Release Notes 自动生成
+- [x] 打 Tag 后自动创建 Release
+- [x] Release 包含安装包
+- [x] Release Notes 自动生成
+
+**验收时间:** 2026-07-16
 
 ---
 
