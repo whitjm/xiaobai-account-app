@@ -1,6 +1,15 @@
 // 合计条:显示总收入、总支出、结余
-export default function Summary({ summary }) {
-  const fmt = (n) => Number(n).toFixed(2)
+
+interface SummaryProps {
+  summary: {
+    expense: number
+    income: number
+    balance: number
+  }
+}
+
+export default function Summary({ summary }: SummaryProps) {
+  const fmt = (n: number) => Number(n).toFixed(2)
   return (
     <div className="summary">
       <div className="summary-item income">

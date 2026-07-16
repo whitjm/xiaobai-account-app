@@ -14,10 +14,10 @@ const ICONS: Record<string, string> = {
   工资: '💰',
   兼职: '💼',
   投资: '📈',
-}
+};
 
-const DEFAULT_ICON = '🏷️'
+const DEFAULT_ICON = '🏷️';
 
 export function majorIcon(major: string): string {
-  return ICONS[major] || DEFAULT_ICON
+  return ICONS[major] || DEFAULT_ICON;
 }

@@ -1,40 +1,40 @@
 // 数据库模块:用 sql.js(纯 JS 版 SQLite)在本地文件里存账目和分类。
 // sql.js 在内存中操作数据库,因此每次写入后都把数据落盘到用户数据目录的 xiaobai.db 文件,
 // 保证关掉软件数据不丢。
-import path from 'path'
-import fs from 'fs'
-import initSqlJs from 'sql.js'
-import { seedDefaultCategories } from './seed-categories'
+import path from 'path';
+import fs from 'fs';
+import initSqlJs from 'sql.js';
+import { seedDefaultCategories } from './seed-categories';
 
-let SQL: typeof import('sql.js') | null = null // sql.js 引擎(异步初始化一次)
-let db: import('sql.js').Database | null = null // 当前数据库实例
-let dbFilePath = '' // 数据库文件在硬盘上的路径
+let SQL: typeof import('sql.js') | null = null; // sql.js 引擎(异步初始化一次)
+let db: import('sql.js').Database | null = null; // 当前数据库实例
+let dbFilePath = ''; // 数据库文件在硬盘上的路径
 
 // 初始化数据库:定位文件、加载引擎，建表、灌入默认分类
 export async function initDb(userDataDir: string): Promise<void> {
   // 确保数据目录存在(首次运行时可能还没创建)
   if (!fs.existsSync(userDataDir)) {
-    fs.mkdirSync(userDataDir, { recursive: true })
+    fs.mkdirSync(userDataDir, { recursive: true });
   }
-  dbFilePath = path.join(userDataDir, 'xiaobai.db')
+  dbFilePath = path.join(userDataDir, 'xiaobai.db');
 
   // 加载 sql.js 引擎。直接把 wasm 引擎文件读成二进制喂给它,
   // 这样无论开发模式还是打包后(代码被压进 asar 压缩包)都能稳定找到,避免路径问题。
-  const wasmPath = path.join(__dirname, '..', 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm')
-  const wasmBinary = fs.readFileSync(wasmPath)
-  SQL = await initSqlJs({ wasmBinary })
+  const wasmPath = path.join(__dirname, '..', 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm');
+  const wasmBinary = fs.readFileSync(wasmPath);
+  SQL = await initSqlJs({ wasmBinary });
 
   // 若已有数据库文件则读入,否则新建空库
   if (fs.existsSync(dbFilePath)) {
-    const fileBuffer = fs.readFileSync(dbFilePath)
-    db = new SQL.Database(fileBuffer)
+    const fileBuffer = fs.readFileSync(dbFilePath);
+    db = new SQL.Database(fileBuffer);
   } else {
-    db = new SQL.Database()
+    db = new SQL.Database();
   }
 
-  createTables()
-  seedDefaultCategories(db!)
-  save()
+  createTables();
+  seedDefaultCategories(db!);
+  save();
 }
 
 // 建表:分类表 + 账目表
@@ -48,15 +48,15 @@ function createTables(): void {
       sort INTEGER DEFAULT 0,          -- 排序用
       is_preset INTEGER DEFAULT 0      -- 1=软件预置(不可改删) 0=用户自建(可改删)
     );
-  `)
+  `);
 
   // 兼容老数据库:早期版本的 categories 表没有 is_preset 列。
   // 若缺列则补上,并把已有分类(都是预置的)统一标记为预置,避免被误当成用户分类。
-  const cols = db!.exec('PRAGMA table_info(categories)')
-  const colNames = cols.length ? cols[0].values.map((r) => r[1] as string) : []
+  const cols = db!.exec('PRAGMA table_info(categories)');
+  const colNames = cols.length ? cols[0].values.map((r) => r[1] as string) : [];
   if (!colNames.includes('is_preset')) {
-    db!.run('ALTER TABLE categories ADD COLUMN is_preset INTEGER DEFAULT 0')
-    db!.run('UPDATE categories SET is_preset = 1')
+    db!.run('ALTER TABLE categories ADD COLUMN is_preset INTEGER DEFAULT 0');
+    db!.run('UPDATE categories SET is_preset = 1');
   }
 
   db!.run(`
@@ -70,16 +70,57 @@ function createTables(): void {
       note TEXT DEFAULT '',            -- 备注
       created_at TEXT NOT NULL         -- 记录创建时间
     );
-  `)
+  `);
+
+  // 设置表：存储 LLM 配置等
+  db!.run(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
+  `);
 }
 
 // 把内存数据库写回硬盘
 export function save(): void {
-  const data = db!.export()
-  fs.writeFileSync(dbFilePath, Buffer.from(data))
+  const data = db!.export();
+  fs.writeFileSync(dbFilePath, Buffer.from(data));
 }
 
 // 获取数据库实例
 export function getDb(): import('sql.js').Database | null {
-  return db
+  return db;
+}
+
+// 重置数据库：清空所有账目和自定义分类，重新灌入默认分类
+export function resetDatabase(): void {
+  if (!db) throw new Error('数据库未初始化');
+
+  // 删除所有账目
+  db.run('DELETE FROM records');
+
+  // 删除所有自定义分类（保留预置分类会被 seedDefaultCategories 处理）
+  db.run('DELETE FROM categories WHERE is_preset = 0');
+
+  // 重新灌入默认分类（如果表为空才灌入）
+  seedDefaultCategories(db);
+
+  save();
+}
+
+// 获取设置
+export function getSetting(key: string): string | null {
+  if (!db) return null;
+  const result = db.exec(`SELECT value FROM settings WHERE key = ?`, [key]);
+  if (result.length && result[0].values.length) {
+    return result[0].values[0][0] as string;
+  }
+  return null;
+}
+
+// 保存设置
+export function setSetting(key: string, value: string): void {
+  if (!db) throw new Error('数据库未初始化');
+  db.run(`INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)`, [key, value]);
+  save();
 }

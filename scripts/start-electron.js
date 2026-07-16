@@ -1,11 +1,30 @@
-// 启动器:某些环境预设了 ELECTRON_RUN_AS_NODE=1,会让 Electron 退化成普通 Node 运行,
-// 导致拿不到应用窗口对象。这里在启动 Electron 前把该变量彻底删除,再以干净环境启动。
-// 用 Node 运行本文件即可(见 package.json 的 dev:electron 脚本)。
-const { spawn } = require('child_process');
-const electronPath = require('electron');
+// 启动器:编译 TypeScript 后启动 Electron
+const { spawn, execSync } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 const env = { ...process.env };
 delete env.ELECTRON_RUN_AS_NODE;
 
-const child = spawn(electronPath, ['.'], { stdio: 'inherit', env });
+const root = path.join(__dirname, '..');
+
+// 清理旧的编译文件
+const distElectron = path.join(root, 'dist-electron');
+if (fs.existsSync(distElectron)) {
+  fs.rmSync(distElectron, { recursive: true });
+}
+
+// 编译 TypeScript
+console.log('编译 Electron TypeScript...');
+try {
+  execSync('npx tsc --project tsconfig.electron.json', { stdio: 'inherit', cwd: root });
+} catch (e) {
+  console.error('编译失败:', e.message);
+  process.exit(1);
+}
+
+// 启动 Electron
+console.log('启动 Electron...');
+const electronPath = require('electron');
+const child = spawn(electronPath, ['.'], { stdio: 'inherit', env, cwd: root });
 child.on('close', (code) => process.exit(code ?? 0));

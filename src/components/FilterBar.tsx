@@ -1,7 +1,18 @@
 import DatePicker from 'react-datepicker'
 import { zhCN } from 'date-fns/locale'
 import 'react-datepicker/dist/react-datepicker.css'
-import { rangeLabel } from '../utils/dateRange.js'
+import { rangeLabel } from '../utils/dateRange'
+import type { DateRangeMode } from '../types'
+
+interface FilterBarProps {
+  mode: DateRangeMode | 'custom'
+  anchor: Date
+  customStart: Date
+  customEnd: Date
+  onModeChange: (mode: DateRangeMode | 'custom') => void
+  onShift: (step: number) => void
+  onCustomChange: (start: Date, end: Date) => void
+}
 
 // 时间筛选栏:快捷范围(周/月/年/全部/自定义)+ 上一个/下一个翻页 + 自定义日历选起止日期
 export default function FilterBar({
@@ -12,7 +23,7 @@ export default function FilterBar({
   onModeChange,
   onShift,
   onCustomChange,
-}) {
+}: FilterBarProps) {
   const modes = [
     { key: 'week', label: '本周' },
     { key: 'month', label: '本月' },
@@ -30,7 +41,7 @@ export default function FilterBar({
           <button
             key={m.key}
             className={mode === m.key ? 'active' : ''}
-            onClick={() => onModeChange(m.key)}
+            onClick={() => onModeChange(m.key as DateRangeMode | 'custom')}
           >
             {m.label}
           </button>
@@ -40,7 +51,7 @@ export default function FilterBar({
       {showPager && (
         <div className="filter-pager">
           <button onClick={() => onShift(-1)}>‹ 上一个</button>
-          <span className="filter-label">{rangeLabel(mode, anchor)}</span>
+          <span className="filter-label">{rangeLabel(mode as DateRangeMode, anchor)}</span>
           <button onClick={() => onShift(1)}>下一个 ›</button>
         </div>
       )}
@@ -49,7 +60,7 @@ export default function FilterBar({
         <div className="filter-custom">
           <DatePicker
             selected={customStart}
-            onChange={(d) => onCustomChange(d, customEnd)}
+            onChange={(date: Date | null) => date && onCustomChange(date, customEnd)}
             selectsStart
             startDate={customStart}
             endDate={customEnd}
@@ -61,7 +72,7 @@ export default function FilterBar({
           <span className="tilde">至</span>
           <DatePicker
             selected={customEnd}
-            onChange={(d) => onCustomChange(customStart, d)}
+            onChange={(date: Date | null) => date && onCustomChange(customStart, date)}
             selectsEnd
             startDate={customStart}
             endDate={customEnd}

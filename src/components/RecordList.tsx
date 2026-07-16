@@ -1,15 +1,24 @@
 import { useState } from 'react'
+import type { RecordEntry } from '../types'
 
 // 账目列表:按日期倒序展示每一笔,支持编辑和删除(删除有确认提示)。
 // title/emptyTip 可自定义标题与空态文案,供记账页/编辑记录页复用。
+interface RecordListProps {
+  records: RecordEntry[]
+  onEdit: (record: RecordEntry) => void
+  onDelete: (id: number) => void
+  title?: string
+  emptyTip?: string
+}
+
 export default function RecordList({
   records,
   onEdit,
   onDelete,
   title = '账目明细',
   emptyTip = '还没有记录,快去记第一笔吧 📝',
-}) {
-  const [confirmId, setConfirmId] = useState(null) // 正在确认删除的记录 id
+}: RecordListProps) {
+  const [confirmId, setConfirmId] = useState<number | null>(null) // 正在确认删除的记录 id
 
   if (records.length === 0) {
     return (
@@ -52,7 +61,7 @@ export default function RecordList({
                   <button
                     className="btn-danger-sm"
                     onClick={() => {
-                      onDelete(r.id)
+                      onDelete(r.id!)
                       setConfirmId(null)
                     }}
                   >
@@ -67,7 +76,7 @@ export default function RecordList({
                   <button className="btn-ghost-sm" onClick={() => onEdit(r)}>
                     编辑
                   </button>
-                  <button className="btn-ghost-sm" onClick={() => setConfirmId(r.id)}>
+                  <button className="btn-ghost-sm" onClick={() => setConfirmId(r.id!)}>
                     删除
                   </button>
                 </div>

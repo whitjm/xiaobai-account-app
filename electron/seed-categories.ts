@@ -1,13 +1,6 @@
 // 默认分类数据:软件首次运行时灌入,开箱即用。
 // 已由用户确认(2026-07-08)。结构:type(支出/收入)→ major(大类)→ minor 列表(小类)。
 
-interface SqlJs {
-  Database: new (data?: ArrayLike<number>) => {
-    exec: (sql: string, params?: unknown[]) => { columns: string[]; values: unknown[][] }[]
-    run: (sql: string, params?: unknown[]) => void
-  }
-}
-
 const DEFAULT_CATEGORIES = {
   expense: [
     { major: '餐饮', minors: ['早餐', '午餐', '晚餐', '饮料零食', '下馆子'] },
@@ -27,25 +20,28 @@ const DEFAULT_CATEGORIES = {
     { major: '人情', minors: ['收红包', '他人还款'] },
     { major: '其他', minors: ['退款', '意外之财', '其他收入'] },
   ],
-}
+};
 
 // 只在分类表为空时灌入,避免用户后续自定义的分类被覆盖
-export function seedDefaultCategories(db: { exec: (sql: string) => { columns: string[]; values: unknown[][] }[]; run: (sql: string, params?: unknown[]) => void }): void {
-  const result = db.exec('SELECT COUNT(*) AS n FROM categories')
-  const count = result.length ? (result[0].values[0][0] as number) : 0
-  if (count > 0) return
+export function seedDefaultCategories(db: {
+  exec: (sql: string) => { columns: string[]; values: unknown[][] }[];
+  run: (sql: string, params?: unknown[]) => void;
+}): void {
+  const result = db.exec('SELECT COUNT(*) AS n FROM categories');
+  const count = result.length ? (result[0].values[0][0] as number) : 0;
+  if (count > 0) return;
 
-  let sort = 0
+  let sort = 0;
   for (const type of ['expense', 'income'] as const) {
     for (const group of DEFAULT_CATEGORIES[type]) {
       for (const minor of group.minors) {
         db.run(
           'INSERT INTO categories (type, major, minor, sort, is_preset) VALUES (?, ?, ?, ?, 1)',
           [type, group.major, minor, sort++]
-        )
+        );
       }
     }
   }
 }
 
-export { DEFAULT_CATEGORIES }
+export { DEFAULT_CATEGORIES };

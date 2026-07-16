@@ -9,7 +9,14 @@ import prettierConfig from 'eslint-config-prettier';
 export default [
   js.configs.recommended,
   {
-    ignores: ['dist/**', '.codex/**', 'release/**', 'node_modules/**'],
+    ignores: [
+      'dist/**',
+      'dist-electron/**',
+      '.codex/**',
+      'release/**',
+      'node_modules/**',
+      'src/types/*.d.ts',
+    ],
   },
   {
     files: ['**/*.js'],
@@ -66,6 +73,17 @@ export default [
         __dirname: 'readonly',
         process: 'readonly',
         vi: 'readonly',
+        Buffer: 'readonly',
+        localStorage: 'readonly',
+        navigator: 'readonly',
+        MediaRecorder: 'readonly',
+        Blob: 'readonly',
+        File: 'readonly',
+        SpeechRecognition: 'readonly',
+        webkitSpeechRecognition: 'readonly',
+        TextDecoder: 'readonly',
+        TextEncoder: 'readonly',
+        tool: 'readonly',
       },
     },
     plugins: {
@@ -104,6 +122,7 @@ export default [
         ipcRenderer: 'readonly',
         BrowserWindow: 'readonly',
         Buffer: 'readonly',
+        exports: 'readonly',
       },
     },
     rules: {

@@ -1,43 +1,49 @@
 import { useState } from 'react'
-import { majorIcon } from '../utils/categoryIcons.js'
+import { majorIcon } from '../utils/categoryIcons'
+import type { Categories, CategoryMinor, CategoryGroup, RecordType } from '../types'
+
+interface CategoryManagerProps {
+  categories: Categories
+  onChanged: () => void
+}
 
 // 分类管理页:查看全部分类,新增/修改/删除【用户自建】分类。
 // 预置分类只读,不显示改删按钮。categories 为两级分类数据,onChanged 通知外层刷新。
-export default function CategoryManager({ categories, onChanged }) {
-  const [type, setType] = useState('expense') // 当前查看支出还是收入
+export default function CategoryManager({ categories, onChanged }: CategoryManagerProps) {
+  const [type, setType] = useState<RecordType>('expense') // 当前查看支出还是收入
   const [msg, setMsg] = useState('')
-  const [editingId, setEditingId] = useState(null) // 正在编辑的小类 id
+  const [editingId, setEditingId] = useState<number | null>(null) // 正在编辑的小类 id
   const [editMajor, setEditMajor] = useState('')
   const [editMinor, setEditMinor] = useState('')
-  const [confirmId, setConfirmId] = useState(null) // 正在确认删除的小类 id
+  const [confirmId, setConfirmId] = useState<number | null>(null) // 正在确认删除的小类 id
 
   // 新增表单
   const [newMajor, setNewMajor] = useState('')
   const [newMinor, setNewMinor] = useState('')
 
-  const groups = categories[type] || []
+  const groups: CategoryGroup[] = categories[type] || []
   // 已有大类名字(供新增时下拉快速选择,也可手输新大类)
   const majorNames = groups.map((g) => g.major)
 
-  function show(text) {
+  function show(text: string) {
     setMsg(text)
     setTimeout(() => setMsg(''), 3500)
   }
 
-  async function handleAdd(e) {
+  async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
     const r = await window.api.addCategory({ type, major: newMajor, minor: newMinor })
     if (r.ok) {
       show('已添加分类')
       setNewMajor('')
       setNewMinor('')
-      onChanged?.()
+      onChanged()
     } else {
       show(r.error || '添加失败')
     }
   }
 
-  function startEdit(major, minor) {
+  function startEdit(major: string, minor: CategoryMinor) {
     setEditingId(minor.id)
     setEditMajor(major)
     setEditMinor(minor.name)
@@ -46,25 +52,25 @@ export default function CategoryManager({ categories, onChanged }) {
 
   async function saveEdit() {
     const r = await window.api.updateCategory({
-      id: editingId,
+      id: editingId!,
       major: editMajor,
       minor: editMinor,
     })
     if (r.ok) {
       show('已保存修改')
       setEditingId(null)
-      onChanged?.()
+      onChanged()
     } else {
       show(r.error || '修改失败')
     }
   }
 
-  async function handleDelete(id) {
+  async function handleDelete(id: number) {
     const r = await window.api.deleteCategory(id)
     if (r.ok) {
       show('已删除分类')
       setConfirmId(null)
-      onChanged?.()
+      onChanged()
     } else {
       show(r.error || '删除失败')
     }

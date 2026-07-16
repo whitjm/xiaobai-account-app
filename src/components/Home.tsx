@@ -1,15 +1,20 @@
 import { useMemo } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
-import { computeRange, inRange } from '../utils/dateRange.js'
+import { computeRange, inRange } from '../utils/dateRange'
+import type { RecordEntry } from '../types'
 
 const COLORS = [
   '#007aff', '#ff3b30', '#34c759', '#ff9500', '#5856d6',
   '#ec4899', '#8b5cf6', '#14b8a6', '#f97316', '#00c7be',
 ]
 
+interface HomeProps {
+  records: RecordEntry[]
+  onNavigate: (page: string) => void
+}
+
 // 首页总览:本月收支结余大数字 + 支出分类小饼图 + 最近几笔账。
-// records 为全部账目;onNavigate(page) 用于点击快捷入口跳转到其它页。
-export default function Home({ records, onNavigate }) {
+export default function Home({ records, onNavigate }: HomeProps) {
   // 本月范围
   const range = useMemo(() => computeRange('month', new Date()), [])
   const monthRecs = useMemo(
@@ -30,7 +35,7 @@ export default function Home({ records, onNavigate }) {
 
   // 本月支出按大类占比(小饼图)
   const pieData = useMemo(() => {
-    const map = {}
+    const map: Record<string, number> = {}
     for (const r of monthRecs) {
       if (r.type !== 'expense') continue
       map[r.major] = (map[r.major] || 0) + r.amount
@@ -43,7 +48,7 @@ export default function Home({ records, onNavigate }) {
   // 最近 6 笔(records 已按日期倒序)
   const recent = records.slice(0, 6)
 
-  const fmt = (n) => Number(n).toFixed(2)
+  const fmt = (n: number) => Number(n).toFixed(2)
   const monthLabel = `${new Date().getFullYear()}年${new Date().getMonth() + 1}月`
 
   return (
@@ -68,7 +73,7 @@ export default function Home({ records, onNavigate }) {
           {pieData.length === 0 ? (
             <p className="empty-tip">本月还没有支出记录</p>
           ) : (
-            <ResponsiveContainer width="100%" height={230}>
+            <ResponsiveContainer width="100%" height={280}>
               <PieChart>
                 <Pie
                   data={pieData}
@@ -79,13 +84,13 @@ export default function Home({ records, onNavigate }) {
                   innerRadius={50}
                   outerRadius={90}
                   paddingAngle={2}
-                  label={(e) => `${e.name} ${(e.percent * 100).toFixed(0)}%`}
+                  label={(e: { name: string; percent: number }) => `${e.name} ${(e.percent * 100).toFixed(0)}%`}
                 >
                   {pieData.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(v) => `¥${v}`} />
+                <Tooltip formatter={(v: number) => `¥${v}`} />
               </PieChart>
             </ResponsiveContainer>
           )}

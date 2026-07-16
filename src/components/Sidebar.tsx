@@ -1,13 +1,20 @@
-// 左侧菜单栏:首页 / 记账 / 统计 / 编辑记录 / 分类管理
+// 左侧菜单栏:首页 / 记账 / 统计 / 编辑记录 / 分类管理 / AI助手 / 设置
 const MENU = [
   { key: 'home', label: '首页', icon: '🏠' },
   { key: 'record', label: '记账', icon: '✍️' },
   { key: 'stats', label: '统计', icon: '📊' },
   { key: 'edit', label: '编辑记录', icon: '📋' },
   { key: 'category', label: '分类管理', icon: '🏷️' },
+  { key: 'ai', label: 'AI助手', icon: '🤖' },
+  { key: 'settings', label: '设置', icon: '⚙️' },
 ]
 
-export default function Sidebar({ page, onChange }) {
+interface SidebarProps {
+  page: string
+  onChange: (page: string) => void
+}
+
+export default function Sidebar({ page, onChange }: SidebarProps) {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -18,7 +25,7 @@ export default function Sidebar({ page, onChange }) {
         {MENU.map((m) => (
           <button
             key={m.key}
-            className={`sidebar-item ${page === m.key ? 'active' : ''}`}
+            className={`sidebar-item ${page === m.key ? 'active' : ''} ${m.key === 'ai' ? 'ai-item' : ''}`}
             onClick={() => onChange(m.key)}
           >
             <span className="sidebar-icon">{m.icon}</span>
