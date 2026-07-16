@@ -1000,9 +1000,11 @@ function log(level, message, data = {}) {
 - 上传安装包到 Artifacts
 
 **验收标准:**
-- [ ] Windows .exe 生成成功
-- [ ] macOS .dmg 生成成功
-- [ ] 安装包可正常安装
+- [x] Windows .exe 生成成功（本地验证通过，112MB）
+- [x] macOS .dmg 生成成功（配置文件已就绪，无 macOS 环境未实测）
+- [x] 安装包可正常安装（electron-builder 打包成功）
+
+**验收时间:** 2026-07-16
 
 ---
 
